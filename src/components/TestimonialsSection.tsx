@@ -2,7 +2,7 @@
 import React, { useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import anime from 'animejs/lib/anime.es.js';
+import animejs from 'animejs';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -75,7 +75,7 @@ const TestimonialsSection = () => {
             const text = quoteElement.textContent || '';
             quoteElement.textContent = '';
             
-            anime({
+            animejs({
               targets: quoteElement,
               duration: text.length * 30,
               delay: index * 200,
