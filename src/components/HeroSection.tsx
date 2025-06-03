@@ -1,7 +1,7 @@
 
 import React, { useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
-import animejs from 'animejs';
+import * as anime from 'animejs';
 import { Button } from '@/components/ui/button';
 import { ChevronDown } from 'lucide-react';
 
@@ -43,11 +43,11 @@ const HeroSection = () => {
 
     // Animate title letters
     if (titleRef.current) {
-      animejs({
+      anime({
         targets: titleRef.current?.querySelectorAll('.letter'),
         opacity: [0, 1],
         translateY: [30, 0],
-        delay: animejs.stagger(100, {start: 500}),
+        delay: anime.stagger(100, {start: 500}),
         duration: 800,
         easing: 'easeOutQuart'
       });
