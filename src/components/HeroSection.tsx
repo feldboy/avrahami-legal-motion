@@ -1,7 +1,6 @@
-
 import React, { useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
-import * as anime from 'animejs';
+import anime from 'animejs';
 import { Button } from '@/components/ui/button';
 import { ChevronDown } from 'lucide-react';
 
