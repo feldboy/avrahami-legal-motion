@@ -1,7 +1,10 @@
 import React, { useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import * as anime from 'animejs';
+import * as animeModule from 'animejs';
+
+// Get the anime function from the module
+const anime = animeModule.default || animeModule;
 
 gsap.registerPlugin(ScrollTrigger);
 
