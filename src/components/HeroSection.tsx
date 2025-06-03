@@ -1,10 +1,8 @@
 import React, { useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
-import * as animeModule from 'animejs';
+import anime from 'animejs/lib/anime.es.js';
 import { Button } from '@/components/ui/button';
 import { ChevronDown } from 'lucide-react';
-
-const anime = animeModule.default || animeModule;
 
 const HeroSection = () => {
   const heroRef = useRef<HTMLDivElement>(null);
