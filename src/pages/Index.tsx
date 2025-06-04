@@ -2,11 +2,12 @@
 import React, { useEffect } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import HeroSection from '@/components/HeroSection';
+import EnhancedHeroSection from '@/components/EnhancedHeroSection';
 import AboutSection from '@/components/AboutSection';
-import ExpertiseSection from '@/components/ExpertiseSection';
+import EnhancedExpertiseSection from '@/components/EnhancedExpertiseSection';
 import TestimonialsSection from '@/components/TestimonialsSection';
 import ContactSection from '@/components/ContactSection';
+import { AnimationPerformance } from '@/lib/animations';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -41,9 +42,9 @@ const Index = () => {
 
   return (
     <div className="page-content">
-      <HeroSection />
+      <EnhancedHeroSection />
       <AboutSection />
-      <ExpertiseSection />
+      <EnhancedExpertiseSection />
       <TestimonialsSection />
       <ContactSection />
       

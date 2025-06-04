@@ -1,7 +1,6 @@
 
 import React, { useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
-import { animate, stagger } from 'animejs';
 import { Button } from '@/components/ui/button';
 import { ChevronDown } from 'lucide-react';
 
@@ -12,43 +11,45 @@ const HeroSection = () => {
   const ctaRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const timeline = gsap.timeline();
-
     // Initial setup - hide elements
     gsap.set([titleRef.current, subtitleRef.current, ctaRef.current], {
       opacity: 0,
       y: 50
     });
 
-    // Animate in sequence
-    timeline
-      .to(titleRef.current, {
-        opacity: 1,
-        y: 0,
-        duration: 1.2,
-        ease: "power3.out"
-      })
-      .to(subtitleRef.current, {
-        opacity: 1,
-        y: 0,
-        duration: 0.8,
-        ease: "power2.out"
-      }, "-=0.6")
-      .to(ctaRef.current, {
-        opacity: 1,
-        y: 0,
-        duration: 0.6,
-        ease: "power2.out"
-      }, "-=0.4");
+    // Animate in sequence using GSAP timeline
+    const tl = gsap.timeline({
+      ease: "power2.out"
+    });
+
+    tl.to(titleRef.current, {
+      opacity: 1,
+      y: 0,
+      duration: 1.2
+    })
+    .to(subtitleRef.current, {
+      opacity: 1,
+      y: 0,
+      duration: 0.8
+    }, "-=0.6") // Relative timing
+    .to(ctaRef.current, {
+      opacity: 1,
+      y: 0,
+      duration: 0.6
+    }, "-=0.4"); // Relative timing
 
     // Animate title letters
     if (titleRef.current) {
-      animate(titleRef.current?.querySelectorAll('.letter'), {
-        opacity: [0, 1],
-        translateY: [30, 0],
-        delay: stagger(100, {start: 500}),
-        duration: 800,
-        easing: 'easeOutQuart'
+      gsap.fromTo(titleRef.current.querySelectorAll('.letter'), {
+        opacity: 0,
+        y: 30
+      }, {
+        opacity: 1,
+        y: 0,
+        duration: 0.8,
+        stagger: 0.1,
+        delay: 0.5,
+        ease: "power2.out"
       });
     }
 

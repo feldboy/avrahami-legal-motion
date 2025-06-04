@@ -1,7 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import * as anime from 'animejs';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -63,7 +62,7 @@ const TestimonialsSection = () => {
       }
     );
 
-    // Animate quotes with typing effect
+    // Animate quotes with typing effect using GSAP
     cardsRef.current.forEach((card, index) => {
       const quoteElement = card?.querySelector('.quote-text');
       if (quoteElement) {
@@ -74,13 +73,12 @@ const TestimonialsSection = () => {
             const text = quoteElement.textContent || '';
             quoteElement.textContent = '';
             
-            anime({
-              targets: quoteElement,
-              duration: text.length * 30,
-              delay: index * 200,
-              update: function(anim) {
-                const progress = Math.round(anim.progress);
-                const currentLength = Math.round((text.length * progress) / 100);
+            gsap.to({}, {
+              duration: text.length * 0.03,
+              delay: index * 0.2,
+              onUpdate: function() {
+                const progress = this.progress();
+                const currentLength = Math.round(text.length * progress);
                 quoteElement.textContent = text.substring(0, currentLength);
               }
             });
