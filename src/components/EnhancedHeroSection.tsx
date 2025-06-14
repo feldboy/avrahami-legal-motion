@@ -50,98 +50,151 @@ const EnhancedHeroSection = () => {
       threeManagerRef.current.animate();
     }
 
-    // Enhanced text animations using new system
-    const masterTimeline = createTimeline({
-      duration: ANIMATION_CONFIG.durations.slow,
-      easing: ANIMATION_CONFIG.easings.smooth
-    });
+    const prefersReducedMotion = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    // Animate title with advanced text reveal
-    if (titleRef.current) {
-      setTimeout(() => {
-        animateTextReveal(titleRef.current!, {
-          splitBy: 'chars',
-          staggerDelay: 80,
-          animationType: 'fadeUp'
+    let mainTl: gsap.core.Timeline | null = null;
+    let reducedMotionTl: gsap.core.Timeline | null = null;
+    let scalesIconTween: gsap.core.Tween | null = null;
+    let scrollIndicatorTween: gsap.core.Tween | null = null;
+
+    if (prefersReducedMotion) {
+      // Reduced motion animations
+      if (threeDContainerRef.current) {
+        threeDContainerRef.current.style.opacity = '0.05'; // Minimal 3D bg visibility
+        // Do not call threeManagerRef.current.animate()
+      }
+
+      // Simple fade-in for text and CTAs
+      reducedMotionTl = gsap.timeline();
+      const elementsToFade = [];
+      if (titleRef.current) elementsToFade.push(titleRef.current);
+      if (subtitleRef.current) elementsToFade.push(subtitleRef.current);
+      if (ctaRef.current) {
+        const ctaButtons = ctaRef.current.querySelectorAll('.cta-button');
+        elementsToFade.push(...Array.from(ctaButtons));
+         // Apply hover animations even in reduced motion, as they are user-initiated
+        ctaButtons.forEach(button => {
+          createHoverAnimation(
+            button,
+            { scale: 1.05, translateY: -5, boxShadow: '0 20px 40px rgba(205, 164, 52, 0.3)' },
+            { scale: 1, translateY: 0, boxShadow: '0 10px 20px rgba(205, 164, 52, 0.1)' }
+          );
         });
-      }, 500);
-    }
+      }
 
-    // Animate subtitle with word-by-word reveal
-    if (subtitleRef.current) {
-      setTimeout(() => {
-        animateTextReveal(subtitleRef.current!, {
-          splitBy: 'words',
-          staggerDelay: 120,
-          animationType: 'scale'
+      if (elementsToFade.length > 0) {
+        reducedMotionTl.to(elementsToFade, {
+          opacity: 1,
+          duration: 0.5,
+          stagger: 0.1, // Slight stagger for a bit of separation
         });
-      }, 1200);
-    }
+      }
+      // No continuous animations (SVG icon rotation, scroll indicator bounce)
 
-    // Enhanced CTA animations
-    if (ctaRef.current) {
-      const ctaButtons = ctaRef.current.querySelectorAll('.cta-button');
-      ctaButtons.forEach((button, index) => {
-        // Add sophisticated hover animations
-        createHoverAnimation(
-          button,
-          {
-            scale: 1.05,
-            translateY: -5,
-            boxShadow: '0 20px 40px rgba(205, 164, 52, 0.3)'
-          },
-          {
-            scale: 1,
-            translateY: 0,
-            boxShadow: '0 10px 20px rgba(205, 164, 52, 0.1)'
-          }
+    } else {
+      // Full animation experience
+      if (threeManagerRef.current) {
+        threeManagerRef.current.animate(); // Start 3D animation loop
+      }
+
+      mainTl = gsap.timeline();
+
+      // Animate background elements
+      if (threeDContainerRef.current) {
+        mainTl.fromTo(threeDContainerRef.current,
+          { opacity: 0, scale: 0.95 },
+          { opacity: 0.2, scale: 1, duration: 0.8 }
         );
+      }
+      if (heroRef.current) {
+        const backgroundPatternDiv = heroRef.current.querySelector('div.absolute.inset-0.opacity-10');
+        if (backgroundPatternDiv) {
+          mainTl.fromTo(backgroundPatternDiv,
+            { opacity: 0, scale: 0.95 },
+            { opacity: 0.1, scale: 1, duration: 0.8 },
+            "<"
+          );
+        }
+      }
 
-        // Staggered entrance animation
-        setTimeout(() => {
-          gsap.fromTo(button, {
-            opacity: 0,
-            y: 50,
-            scale: 0.8
-          }, {
-            opacity: 1,
-            y: 0,
-            scale: 1,
-            duration: ANIMATION_CONFIG.durations.normal,
-            ease: ANIMATION_CONFIG.easings.bounce,
-            delay: index * 0.2
+      // Animate title
+      if (titleRef.current) {
+        mainTl.fromTo(titleRef.current,
+          { opacity: 0, x: -100 },
+          { opacity: 1, x: 0, duration: 1, ease: 'power2.out' },
+          "+=0.2"
+        );
+      }
+
+      // Animate subtitle
+      if (subtitleRef.current) {
+        mainTl.fromTo(subtitleRef.current,
+          { opacity: 0, x: 100 },
+          { opacity: 1, x: 0, duration: 1, ease: 'power2.out' },
+          "-=0.5"
+        );
+      }
+
+      // Animate CTA buttons
+      if (ctaRef.current) {
+        const ctaButtons = ctaRef.current.querySelectorAll('.cta-button');
+        ctaButtons.forEach((button) => {
+          createHoverAnimation(
+            button,
+            { scale: 1.05, translateY: -5, boxShadow: '0 20px 40px rgba(205, 164, 52, 0.3)' },
+            { scale: 1, translateY: 0, boxShadow: '0 10px 20px rgba(205, 164, 52, 0.1)' }
+          );
+        });
+        mainTl.fromTo(ctaButtons, {
+          opacity: 0, y: 50, scale: 0.8
+        }, {
+          opacity: 1, y: 0, scale: 1,
+          duration: ANIMATION_CONFIG.durations.normal,
+          ease: ANIMATION_CONFIG.easings.bounce,
+          stagger: 0.2
+        }, "+=0.3");
+      }
+
+      // SVG rotation animation for scales icon
+      if (scalesIconRef.current) {
+        scalesIconTween = gsap.to(scalesIconRef.current, {
+          rotation: 360, duration: 10, repeat: -1, ease: "none"
+        });
+      }
+
+      // Floating animation for scroll indicator
+      // Using a timeout to ensure it starts after the main sequence.
+      // Could also be added to mainTl with a delay: mainTl.to('.scroll-indicator', {...}, '+=1');
+      setTimeout(() => {
+        // Check if component is still mounted and scroll indicator exists
+        if (heroRef.current) {
+          scrollIndicatorTween = gsap.to('.scroll-indicator', {
+            y: 15, opacity: 0.7, duration: 2, repeat: -1, yoyo: true, ease: ANIMATION_CONFIG.easings.gentle
           });
-        }, 2000);
-      });
+        }
+      }, 3500);
     }
-
-    // SVG rotation animation for scales icon
-    if (scalesIconRef.current) {
-      gsap.to(scalesIconRef.current, {
-        rotation: 360,
-        duration: 10,
-        repeat: -1,
-        ease: "none"
-      });
-    }
-
-    // Floating animation for scroll indicator with enhanced easing
-    setTimeout(() => {
-      gsap.to('.scroll-indicator', {
-        y: 15,
-        opacity: 0.7,
-        duration: 2,
-        repeat: -1,
-        yoyo: true,
-        ease: ANIMATION_CONFIG.easings.gentle
-      });
-    }, 3500);
 
     // Cleanup function
     return () => {
       if (threeManagerRef.current) {
         threeManagerRef.current.dispose();
       }
+      if (mainTl) {
+        mainTl.kill();
+      }
+      if (reducedMotionTl) {
+        reducedMotionTl.kill();
+      }
+      if (scalesIconTween) {
+        scalesIconTween.kill();
+      }
+      if (scrollIndicatorTween) {
+        scrollIndicatorTween.kill();
+      }
+      // Ensure any other individual tweens created outside timelines are also killed if necessary.
+      // For example, if scroll-indicator click animation was a global tween not tied to component lifecycle.
+      // However, the click animation for scroll-indicator is short-lived and likely okay.
     };
   }, []);
 
